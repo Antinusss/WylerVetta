@@ -662,7 +662,8 @@ create policy hour_purchases_owner_update on hour_purchases for update using (is
 create policy hour_purchases_owner_delete on hour_purchases for delete using (is_owner());
 
 create policy tasks_select on tasks for select using (auth.uid() is not null);
-create policy tasks_insert on tasks for insert with check (auth.uid() is not null);
+create policy tasks_insert on tasks for insert
+  with check (is_owner() or (status = 'non_iniziato' and hours = 0));
 create policy tasks_update on tasks for update using (auth.uid() is not null) with check (auth.uid() is not null);
 create policy tasks_owner_delete on tasks for delete using (is_owner());
 
@@ -784,13 +785,17 @@ export async function updateSession(request: NextRequest) {
   if (!user && !isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
+    return redirectResponse;
   }
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
+    return redirectResponse;
   }
 
   return response;
@@ -1300,6 +1305,7 @@ export default function AddHoursControl({ onAddHours }: AddHoursControlProps) {
   const [purchasedOn, setPurchasedOn] = useState('');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -1307,12 +1313,18 @@ export default function AddHoursControl({ onAddHours }: AddHoursControlProps) {
     if (!parsed || parsed <= 0) return;
 
     setSaving(true);
-    await onAddHours(parsed, purchasedOn, note);
-    setSaving(false);
-    setHours('');
-    setPurchasedOn('');
-    setNote('');
-    setOpen(false);
+    setError(null);
+    try {
+      await onAddHours(parsed, purchasedOn, note);
+      setHours('');
+      setPurchasedOn('');
+      setNote('');
+      setOpen(false);
+    } catch {
+      setError('Errore nel salvataggio delle ore. Riprova.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!open) {
@@ -1359,6 +1371,7 @@ export default function AddHoursControl({ onAddHours }: AddHoursControlProps) {
           className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-neutral-900"
         />
       </div>
+      {error && <p className="text-sm text-rose">{error}</p>}
       <button
         type="submit"
         disabled={saving}
@@ -1773,31 +1786,36 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
 
   const handleAddHours = useCallback(async (hours: number, purchasedOn: string, note: string) => {
     const supabase = createClient();
-    await supabase.from('hour_purchases').insert({ hours, purchased_on: purchasedOn, note });
+    const { error } = await supabase.from('hour_purchases').insert({ hours, purchased_on: purchasedOn, note });
+    if (error) throw error;
   }, []);
 
   const handleAddTask = useCallback(async (title: string, impact: Impact, urgency: Urgency, owner: TaskOwner) => {
     const supabase = createClient();
-    await supabase.from('tasks').insert({ title, impact, urgency, owner });
+    const { error } = await supabase.from('tasks').insert({ title, impact, urgency, owner });
+    if (error) throw error;
   }, []);
 
   const handleUpdateTask = useCallback(
     async (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => {
       const supabase = createClient();
-      await supabase.from('tasks').update(patch).eq('id', id);
+      const { error } = await supabase.from('tasks').update(patch).eq('id', id);
+      if (error) throw error;
     },
     []
   );
 
   const handleDeleteTask = useCallback(async (id: string) => {
     const supabase = createClient();
-    await supabase.from('tasks').delete().eq('id', id);
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error) throw error;
   }, []);
 
   const handleUpdateSettings = useCallback(
     async (patch: Partial<Pick<Settings, 'project_name' | 'client_logo_url' | 'supplier_logo_url'>>) => {
       const supabase = createClient();
-      await supabase.from('settings').update(patch).eq('id', 1);
+      const { error } = await supabase.from('settings').update(patch).eq('id', 1);
+      if (error) throw error;
     },
     []
   );
@@ -1848,7 +1866,7 @@ export default async function PortalPage() {
     redirect('/login');
   }
 
-  const [{ data: profile }, { data: settings }, { data: purchases }, { data: tasks }] = await Promise.all([
+  const [{ data: profile }, { data: settings, error: settingsError }, { data: purchases }, { data: tasks }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('settings').select('*').eq('id', 1).single(),
     supabase.from('hour_purchases').select('*').order('created_at', { ascending: true }),
@@ -1859,10 +1877,14 @@ export default async function PortalPage() {
     redirect('/login');
   }
 
+  if (settingsError || !settings) {
+    redirect('/login');
+  }
+
   return (
     <PortalClient
       role={profile.role}
-      initialSettings={settings!}
+      initialSettings={settings}
       initialPurchases={purchases ?? []}
       initialTasks={tasks ?? []}
     />
