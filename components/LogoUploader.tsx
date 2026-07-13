@@ -19,14 +19,17 @@ export default function LogoUploader({ kind, onUploaded }: LogoUploaderProps) {
     const supabase = createClient();
     const path = `${kind}-${Date.now()}-${file.name}`;
 
-    const { error } = await supabase.storage.from('logos').upload(path, file, { upsert: true });
+    try {
+      const { error } = await supabase.storage.from('logos').upload(path, file, { upsert: true });
+      if (error) throw error;
 
-    if (!error) {
       const { data } = supabase.storage.from('logos').getPublicUrl(path);
       await onUploaded(data.publicUrl);
+    } catch {
+      // upload or settings update failed; button resets below so the user can retry
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   }
 
   return (

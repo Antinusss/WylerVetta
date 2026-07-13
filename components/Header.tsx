@@ -18,7 +18,11 @@ export default function Header({ role, projectName, clientLogoUrl, onUpdateSetti
   async function saveName() {
     setEditingName(false);
     if (nameDraft.trim() && nameDraft !== projectName) {
-      await onUpdateSettings({ project_name: nameDraft.trim() });
+      try {
+        await onUpdateSettings({ project_name: nameDraft.trim() });
+      } catch {
+        // failed to save; realtime won't update project_name, user can retry by editing again
+      }
     }
   }
 

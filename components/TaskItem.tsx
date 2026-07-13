@@ -48,7 +48,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
       <div className="flex flex-wrap items-center gap-3 text-sm">
         <select
           value={task.impact}
-          onChange={(e) => onUpdateTask(task.id, { impact: e.target.value as Impact })}
+          onChange={(e) => onUpdateTask(task.id, { impact: e.target.value as Impact }).catch(() => {})}
           className={`rounded border border-neutral-300 bg-transparent px-1 ${LEVEL_STYLES[task.impact]}`}
         >
           <option value="bassa">Impatto: Bassa</option>
@@ -58,7 +58,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
 
         <select
           value={task.urgency}
-          onChange={(e) => onUpdateTask(task.id, { urgency: e.target.value as Urgency })}
+          onChange={(e) => onUpdateTask(task.id, { urgency: e.target.value as Urgency }).catch(() => {})}
           className={`rounded border border-neutral-300 bg-transparent px-1 ${LEVEL_STYLES[task.urgency]}`}
         >
           <option value="bassa">Urgenza: Bassa</option>
@@ -68,7 +68,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
 
         <select
           value={task.owner}
-          onChange={(e) => onUpdateTask(task.id, { owner: e.target.value as TaskOwner })}
+          onChange={(e) => onUpdateTask(task.id, { owner: e.target.value as TaskOwner }).catch(() => {})}
           className={`rounded px-2 py-0.5 ${OWNER_STYLES[task.owner]}`}
         >
           <option value="Leonardo">Leonardo</option>
@@ -78,7 +78,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
         {isOwnerRole ? (
           <select
             value={task.status}
-            onChange={(e) => onUpdateTask(task.id, { status: e.target.value as TaskStatus })}
+            onChange={(e) => onUpdateTask(task.id, { status: e.target.value as TaskStatus }).catch(() => {})}
             className={`rounded px-2 py-0.5 ${STATUS_STYLES[task.status]}`}
           >
             <option value="non_iniziato">Non iniziato</option>
@@ -96,7 +96,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
             step="0.5"
             min="0"
             value={task.hours}
-            onChange={(e) => onUpdateTask(task.id, { hours: parseFloat(e.target.value) || 0 })}
+            onChange={(e) => onUpdateTask(task.id, { hours: parseFloat(e.target.value) || 0 }).catch(() => {})}
             className="w-16 rounded border border-neutral-300 px-1 font-mono text-neutral-900"
           />
         ) : (
@@ -104,7 +104,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
         )}
 
         {isOwnerRole && (
-          <button onClick={() => onDeleteTask(task.id)} className="text-rose hover:underline">
+          <button onClick={() => onDeleteTask(task.id).catch(() => {})} className="text-rose hover:underline">
             Elimina
           </button>
         )}

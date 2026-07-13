@@ -24,11 +24,15 @@ export default function TaskList({ role, tasks, onAddTask, onUpdateTask, onDelet
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
-    await onAddTask(title.trim(), impact, urgency, owner);
-    setTitle('');
-    setImpact('media');
-    setUrgency('media');
-    setOwner('Leonardo');
+    try {
+      await onAddTask(title.trim(), impact, urgency, owner);
+      setTitle('');
+      setImpact('media');
+      setUrgency('media');
+      setOwner('Leonardo');
+    } catch {
+      // failed to add task; keep the form filled so the user can retry
+    }
   }
 
   return (
