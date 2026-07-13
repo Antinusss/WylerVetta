@@ -21,11 +21,29 @@ export default async function PortalPage() {
   ]);
 
   if (!profile) {
-    redirect('/login');
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
+        <div className="max-w-md rounded-card bg-neutral-50 p-8 text-center shadow-xl">
+          <h1 className="mb-2 font-serif text-xl text-neutral-900">Profilo non configurato</h1>
+          <p className="text-sm text-neutral-600">
+            Il tuo account esiste ma non ha un ruolo assegnato. Contatta il fornitore per completare la configurazione (vedi README, sezione Setup Supabase).
+          </p>
+        </div>
+      </main>
+    );
   }
 
   if (settingsError || !settings) {
-    redirect('/login');
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
+        <div className="max-w-md rounded-card bg-neutral-50 p-8 text-center shadow-xl">
+          <h1 className="mb-2 font-serif text-xl text-neutral-900">Errore di configurazione</h1>
+          <p className="text-sm text-neutral-600">
+            Impossibile caricare le impostazioni del progetto. Riprova più tardi o contatta il fornitore.
+          </p>
+        </div>
+      </main>
+    );
   }
 
   return (

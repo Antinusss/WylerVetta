@@ -100,3 +100,8 @@ create policy "Public read logos" on storage.objects for select using (bucket_id
 create policy "Owner write logos" on storage.objects for insert with check (bucket_id = 'logos' and is_owner());
 create policy "Owner update logos" on storage.objects for update using (bucket_id = 'logos' and is_owner());
 create policy "Owner delete logos" on storage.objects for delete using (bucket_id = 'logos' and is_owner());
+
+-- REALTIME: abilita postgres_changes sulle tabelle usate dal portale
+alter publication supabase_realtime add table settings;
+alter publication supabase_realtime add table hour_purchases;
+alter publication supabase_realtime add table tasks;

@@ -10,7 +10,13 @@ Next.js (App Router) + TypeScript + Tailwind CSS, backend/auth/realtime su Supab
 
 1. Crea un progetto su [supabase.com](https://supabase.com).
 2. Apri l'SQL Editor ed esegui tutto il contenuto di `supabase/schema.sql`.
-3. Vai su **Database → Replication** e abilita Realtime sulle tabelle `settings`, `hour_purchases`, `tasks` (lo schema le crea già come tabelle normali; l'abilitazione della pubblicazione realtime va confermata da dashboard se non gia inclusa di default).
+3. Il Realtime sulle tabelle `settings`, `hour_purchases`, `tasks` è già abilitato automaticamente da `schema.sql` (sezione finale `alter publication supabase_realtime add table ...`): non serve alcun passaggio manuale da **Database → Replication**.
+
+   Nota di fallback: se l'esecuzione dello schema fallisce su quelle righe con un errore tipo "publication supabase_realtime does not exist" (può capitare su alcuni tier/versioni di progetto Supabase che non creano la pubblicazione di default), crea prima la pubblicazione a mano nell'SQL Editor e poi rilancia lo schema:
+
+   ```sql
+   create publication supabase_realtime for table settings, hour_purchases, tasks;
+   ```
 4. Vai su **Storage** e verifica che il bucket `logos` esista (creato dallo schema) con accesso pubblico in lettura.
 5. Vai su **Authentication → Providers** e disabilita "Allow new users to sign up".
 6. Vai su **Authentication → Users** e crea manualmente 2 utenti: uno per il fornitore, uno per il cliente (email + password).
