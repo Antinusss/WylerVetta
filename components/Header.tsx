@@ -37,13 +37,12 @@ export default function Header({ role, projectName, clientLogoUrl, onUpdateSetti
   }
 
   return (
-    <header className="relative flex flex-col items-center gap-3 border-b border-neutral-800 bg-neutral-950 px-4 py-6">
-      <button
-        onClick={handleLogout}
-        className="absolute right-4 top-4 text-sm text-neutral-500 hover:underline"
-      >
-        Esci
-      </button>
+    <header className="flex flex-col items-center gap-3 border-b border-neutral-800 bg-neutral-950 px-4 py-6">
+      <div className="flex w-full justify-end">
+        <button onClick={handleLogout} className="text-sm text-neutral-500 hover:underline">
+          Esci
+        </button>
+      </div>
 
       {role === 'client' && (
         <div className="w-full rounded-lg bg-skyblue/20 px-4 py-2 text-center text-sm text-skyblue">
