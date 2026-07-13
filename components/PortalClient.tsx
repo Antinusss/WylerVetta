@@ -59,31 +59,36 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
 
   const handleAddHours = useCallback(async (hours: number, purchasedOn: string, note: string) => {
     const supabase = createClient();
-    await supabase.from('hour_purchases').insert({ hours, purchased_on: purchasedOn, note });
+    const { error } = await supabase.from('hour_purchases').insert({ hours, purchased_on: purchasedOn, note });
+    if (error) throw error;
   }, []);
 
   const handleAddTask = useCallback(async (title: string, impact: Impact, urgency: Urgency, owner: TaskOwner) => {
     const supabase = createClient();
-    await supabase.from('tasks').insert({ title, impact, urgency, owner });
+    const { error } = await supabase.from('tasks').insert({ title, impact, urgency, owner });
+    if (error) throw error;
   }, []);
 
   const handleUpdateTask = useCallback(
     async (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => {
       const supabase = createClient();
-      await supabase.from('tasks').update(patch).eq('id', id);
+      const { error } = await supabase.from('tasks').update(patch).eq('id', id);
+      if (error) throw error;
     },
     []
   );
 
   const handleDeleteTask = useCallback(async (id: string) => {
     const supabase = createClient();
-    await supabase.from('tasks').delete().eq('id', id);
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error) throw error;
   }, []);
 
   const handleUpdateSettings = useCallback(
     async (patch: Partial<Pick<Settings, 'project_name' | 'client_logo_url' | 'supplier_logo_url'>>) => {
       const supabase = createClient();
-      await supabase.from('settings').update(patch).eq('id', 1);
+      const { error } = await supabase.from('settings').update(patch).eq('id', 1);
+      if (error) throw error;
     },
     []
   );

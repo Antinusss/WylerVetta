@@ -13,7 +13,7 @@ export default async function PortalPage() {
     redirect('/login');
   }
 
-  const [{ data: profile }, { data: settings }, { data: purchases }, { data: tasks }] = await Promise.all([
+  const [{ data: profile }, { data: settings, error: settingsError }, { data: purchases }, { data: tasks }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('settings').select('*').eq('id', 1).single(),
     supabase.from('hour_purchases').select('*').order('created_at', { ascending: true }),
@@ -24,10 +24,14 @@ export default async function PortalPage() {
     redirect('/login');
   }
 
+  if (settingsError || !settings) {
+    redirect('/login');
+  }
+
   return (
     <PortalClient
       role={profile.role}
-      initialSettings={settings!}
+      initialSettings={settings}
       initialPurchases={purchases ?? []}
       initialTasks={tasks ?? []}
     />
