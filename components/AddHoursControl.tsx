@@ -12,6 +12,7 @@ export default function AddHoursControl({ onAddHours }: AddHoursControlProps) {
   const [purchasedOn, setPurchasedOn] = useState('');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,12 +20,18 @@ export default function AddHoursControl({ onAddHours }: AddHoursControlProps) {
     if (!parsed || parsed <= 0) return;
 
     setSaving(true);
-    await onAddHours(parsed, purchasedOn, note);
-    setSaving(false);
-    setHours('');
-    setPurchasedOn('');
-    setNote('');
-    setOpen(false);
+    setError(null);
+    try {
+      await onAddHours(parsed, purchasedOn, note);
+      setHours('');
+      setPurchasedOn('');
+      setNote('');
+      setOpen(false);
+    } catch {
+      setError('Errore nel salvataggio delle ore. Riprova.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!open) {
@@ -71,6 +78,7 @@ export default function AddHoursControl({ onAddHours }: AddHoursControlProps) {
           className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-neutral-900"
         />
       </div>
+      {error && <p className="text-sm text-rose">{error}</p>}
       <button
         type="submit"
         disabled={saving}
