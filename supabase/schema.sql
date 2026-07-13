@@ -87,7 +87,8 @@ create policy hour_purchases_owner_update on hour_purchases for update using (is
 create policy hour_purchases_owner_delete on hour_purchases for delete using (is_owner());
 
 create policy tasks_select on tasks for select using (auth.uid() is not null);
-create policy tasks_insert on tasks for insert with check (auth.uid() is not null);
+create policy tasks_insert on tasks for insert
+  with check (is_owner() or (status = 'non_iniziato' and hours = 0));
 create policy tasks_update on tasks for update using (auth.uid() is not null) with check (auth.uid() is not null);
 create policy tasks_owner_delete on tasks for delete using (is_owner());
 
