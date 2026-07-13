@@ -675,6 +675,11 @@ create policy "Public read logos" on storage.objects for select using (bucket_id
 create policy "Owner write logos" on storage.objects for insert with check (bucket_id = 'logos' and is_owner());
 create policy "Owner update logos" on storage.objects for update using (bucket_id = 'logos' and is_owner());
 create policy "Owner delete logos" on storage.objects for delete using (bucket_id = 'logos' and is_owner());
+
+-- REALTIME: abilita postgres_changes sulle tabelle usate dal portale
+alter publication supabase_realtime add table settings;
+alter publication supabase_realtime add table hour_purchases;
+alter publication supabase_realtime add table tasks;
 ```
 
 - [ ] **Step 2: Review the file for syntax correctness**
@@ -1874,11 +1879,29 @@ export default async function PortalPage() {
   ]);
 
   if (!profile) {
-    redirect('/login');
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
+        <div className="max-w-md rounded-card bg-neutral-50 p-8 text-center shadow-xl">
+          <h1 className="mb-2 font-serif text-xl text-neutral-900">Profilo non configurato</h1>
+          <p className="text-sm text-neutral-600">
+            Il tuo account esiste ma non ha un ruolo assegnato. Contatta il fornitore per completare la configurazione (vedi README, sezione Setup Supabase).
+          </p>
+        </div>
+      </main>
+    );
   }
 
   if (settingsError || !settings) {
-    redirect('/login');
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
+        <div className="max-w-md rounded-card bg-neutral-50 p-8 text-center shadow-xl">
+          <h1 className="mb-2 font-serif text-xl text-neutral-900">Errore di configurazione</h1>
+          <p className="text-sm text-neutral-600">
+            Impossibile caricare le impostazioni del progetto. Riprova più tardi o contatta il fornitore.
+          </p>
+        </div>
+      </main>
+    );
   }
 
   return (
