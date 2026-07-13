@@ -2020,3 +2020,9 @@ git status
 ```
 
 If anything is uncommitted, add and commit it with a descriptive message. Otherwise, this task requires no commit.
+
+---
+
+## Addendum: gap found during Task 14 verification
+
+The design doc (line 19) requires "logout in header," but no task above ever implemented it — an omission in this plan, not in any implementer's work. During Task 14 final verification this was caught by grepping the codebase for `signOut`. Fixed by adding a small "Esci" button to `components/Header.tsx` that calls `supabase.auth.signOut()` (browser client) then `router.push('/login')` + `router.refresh()`, placed in its own flex row (not absolutely positioned, to avoid overlapping the client-role banner). See commits `12342d6` and `f604063`.
