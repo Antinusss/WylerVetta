@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Role, Settings } from '@/lib/types';
+import { createClient } from '@/lib/supabase/client';
 import LogoUploader from './LogoUploader';
 
 interface HeaderProps {
@@ -12,8 +14,16 @@ interface HeaderProps {
 }
 
 export default function Header({ role, projectName, clientLogoUrl, onUpdateSettings }: HeaderProps) {
+  const router = useRouter();
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(projectName);
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  }
 
   async function saveName() {
     setEditingName(false);
@@ -27,7 +37,14 @@ export default function Header({ role, projectName, clientLogoUrl, onUpdateSetti
   }
 
   return (
-    <header className="flex flex-col items-center gap-3 border-b border-neutral-800 bg-neutral-950 px-4 py-6">
+    <header className="relative flex flex-col items-center gap-3 border-b border-neutral-800 bg-neutral-950 px-4 py-6">
+      <button
+        onClick={handleLogout}
+        className="absolute right-4 top-4 text-sm text-neutral-500 hover:underline"
+      >
+        Esci
+      </button>
+
       {role === 'client' && (
         <div className="w-full rounded-lg bg-skyblue/20 px-4 py-2 text-center text-sm text-skyblue">
           Stai visualizzando il portale come cliente
