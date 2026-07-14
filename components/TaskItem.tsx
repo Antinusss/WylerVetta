@@ -39,8 +39,8 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
   const isOwnerRole = role === 'owner';
 
   return (
-    <li className="flex flex-col gap-2 rounded-lg border border-neutral-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-3">
+    <li className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4">
+      <div className="flex items-baseline gap-3">
         <span className="font-mono text-sm text-neutral-400">#{rank}</span>
         <span className="font-medium text-neutral-900">{task.title}</span>
       </div>
@@ -71,8 +71,8 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
           onChange={(e) => onUpdateTask(task.id, { owner: e.target.value as TaskOwner }).catch(() => {})}
           className={`rounded px-2 py-0.5 ${OWNER_STYLES[task.owner]}`}
         >
-          <option value="Leonardo">Leonardo</option>
-          <option value="Amina">Amina</option>
+          <option value="Leonardo">Owner: Leonardo</option>
+          <option value="Amina">Owner: Amina</option>
         </select>
 
         {isOwnerRole ? (
@@ -81,26 +81,29 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
             onChange={(e) => onUpdateTask(task.id, { status: e.target.value as TaskStatus }).catch(() => {})}
             className={`rounded px-2 py-0.5 ${STATUS_STYLES[task.status]}`}
           >
-            <option value="non_iniziato">Non iniziato</option>
-            <option value="in_corso">In corso</option>
-            <option value="completato">Completato</option>
-            <option value="on_hold">On hold</option>
+            <option value="non_iniziato">Stato: Non iniziato</option>
+            <option value="in_corso">Stato: In corso</option>
+            <option value="completato">Stato: Completato</option>
+            <option value="on_hold">Stato: On hold</option>
           </select>
         ) : (
-          <span className={`rounded px-2 py-0.5 ${STATUS_STYLES[task.status]}`}>{STATUS_LABELS[task.status]}</span>
+          <span className={`rounded px-2 py-0.5 ${STATUS_STYLES[task.status]}`}>Stato: {STATUS_LABELS[task.status]}</span>
         )}
 
         {isOwnerRole ? (
-          <input
-            type="number"
-            step="0.5"
-            min="0"
-            value={task.hours}
-            onChange={(e) => onUpdateTask(task.id, { hours: parseFloat(e.target.value) || 0 }).catch(() => {})}
-            className="w-16 rounded border border-neutral-300 px-1 font-mono text-neutral-900"
-          />
+          <label className="flex items-center gap-1 text-neutral-500">
+            Ore:
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              value={task.hours}
+              onChange={(e) => onUpdateTask(task.id, { hours: parseFloat(e.target.value) || 0 }).catch(() => {})}
+              className="w-16 rounded border border-neutral-300 px-1 font-mono text-neutral-900"
+            />
+          </label>
         ) : (
-          <span className="font-mono text-neutral-500">{task.hours}h</span>
+          <span className="font-mono text-neutral-500">Ore: {task.hours}h</span>
         )}
 
         {isOwnerRole && (
