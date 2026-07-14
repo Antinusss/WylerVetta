@@ -19,7 +19,7 @@ export default function TaskList({ role, tasks, onAddTask, onUpdateTask, onDelet
   const [urgency, setUrgency] = useState<Urgency>('media');
   const [owner, setOwner] = useState<TaskOwner>('Leonardo');
 
-  const sorted = sortTasksByPriority(tasks);
+  const active = sortTasksByPriority(tasks).filter((task) => task.status !== 'completato');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,7 +77,7 @@ export default function TaskList({ role, tasks, onAddTask, onUpdateTask, onDelet
       </form>
 
       <ul className="flex flex-col gap-3">
-        {sorted.map((task, index) => (
+        {active.map((task, index) => (
           <TaskItem
             key={task.id}
             task={task}

@@ -4,7 +4,7 @@ import type { Role, Task, Impact, Urgency, TaskOwner, TaskStatus } from '@/lib/t
 
 interface TaskItemProps {
   task: Task;
-  rank: number;
+  rank?: number;
   role: Role;
   onUpdateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => Promise<void>;
   onDeleteTask: (id: string) => Promise<void>;
@@ -41,7 +41,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
   return (
     <li className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4">
       <div className="flex items-baseline gap-3">
-        <span className="font-mono text-sm text-neutral-400">#{rank}</span>
+        {rank !== undefined && <span className="font-mono text-sm text-neutral-400">#{rank}</span>}
         <span className="font-medium text-neutral-900">{task.title}</span>
       </div>
 

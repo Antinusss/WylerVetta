@@ -8,6 +8,7 @@ import Footer from './Footer';
 import HoursSummary from './HoursSummary';
 import AddHoursControl from './AddHoursControl';
 import TaskList from './TaskList';
+import TaskHistory from './TaskHistory';
 import CompletionSummary from './CompletionSummary';
 
 interface PortalClientProps {
@@ -113,6 +114,7 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}
         />
+        <TaskHistory role={role} tasks={tasks} onUpdateTask={handleUpdateTask} onDeleteTask={handleDeleteTask} />
       </main>
 
       <Footer role={role} supplierLogoUrl={settings.supplier_logo_url} onUpdateSettings={handleUpdateSettings} />
