@@ -36,6 +36,7 @@ create table tasks (
   status text not null default 'non_iniziato'
     check (status in ('non_iniziato','in_corso','completato','on_hold')),
   owner text not null default 'Leonardo' check (owner in ('Leonardo','Amina')),
+  completed_on date,
   created_at timestamptz default now()
 );
 
@@ -50,13 +51,15 @@ create or replace function is_owner() returns boolean language sql stable as $$
   select exists(select 1 from profiles where id = auth.uid() and role = 'owner');
 $$;
 
--- TRIGGER: il cliente non puo modificare status/hours delle task
+-- TRIGGER: il cliente non puo modificare status/hours/data completamento delle task
 create or replace function prevent_client_task_status_hours_change() returns trigger
 language plpgsql as $$
 begin
   if not is_owner() then
-    if new.status is distinct from old.status or new.hours is distinct from old.hours then
-      raise exception 'Solo il fornitore puo modificare stato o ore della task';
+    if new.status is distinct from old.status
+      or new.hours is distinct from old.hours
+      or new.completed_on is distinct from old.completed_on then
+      raise exception 'Solo il fornitore puo modificare stato, ore o data di completamento della task';
     end if;
   end if;
   return new;
@@ -88,7 +91,7 @@ create policy hour_purchases_owner_delete on hour_purchases for delete using (is
 
 create policy tasks_select on tasks for select using (auth.uid() is not null);
 create policy tasks_insert on tasks for insert
-  with check (is_owner() or (status = 'non_iniziato' and hours = 0));
+  with check (is_owner() or (status = 'non_iniziato' and hours = 0 and completed_on is null));
 create policy tasks_update on tasks for update using (auth.uid() is not null) with check (auth.uid() is not null);
 create policy tasks_owner_delete on tasks for delete using (is_owner());
 

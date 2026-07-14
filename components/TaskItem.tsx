@@ -6,28 +6,31 @@ interface TaskItemProps {
   task: Task;
   rank?: number;
   role: Role;
-  onUpdateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => Promise<void>;
+  onUpdateTask: (
+    id: string,
+    patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours' | 'completed_on'>>
+  ) => Promise<void>;
   onDeleteTask: (id: string) => Promise<void>;
 }
 
 const STATUS_STYLES: Record<TaskStatus, string> = {
-  non_iniziato: 'bg-neutral-300 text-neutral-800',
-  in_corso: 'bg-amber text-neutral-950',
-  completato: 'bg-sage text-neutral-950',
-  on_hold: 'bg-violet text-neutral-50',
+  non_iniziato: 'bg-rose/15 text-rose',
+  in_corso: 'bg-amber/15 text-amber',
+  completato: 'bg-sage/15 text-sage',
+  on_hold: 'bg-violet/15 text-violet',
 };
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
-  non_iniziato: 'Non iniziato',
+  non_iniziato: 'Da fare',
   in_corso: 'In corso',
   completato: 'Completato',
   on_hold: 'On hold',
 };
 
 const LEVEL_STYLES: Record<Impact | Urgency, string> = {
-  bassa: 'text-skyblue',
-  media: 'text-amber',
-  alta: 'text-rose',
+  bassa: 'bg-skyblue/15 text-skyblue',
+  media: 'bg-amber/15 text-amber',
+  alta: 'bg-rose/15 text-rose',
 };
 
 const OWNER_STYLES: Record<TaskOwner, string> = {
@@ -39,60 +42,82 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
   const isOwnerRole = role === 'owner';
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4">
-      <div className="flex items-baseline gap-3">
-        {rank !== undefined && <span className="font-mono text-sm text-neutral-400">#{rank}</span>}
-        <span className="font-medium text-neutral-900">{task.title}</span>
+    <li className="flex items-start gap-4 border-b border-neutral-200 py-4 last:border-0">
+      {rank !== undefined && (
+        <span className="w-6 shrink-0 pt-1 text-center font-serif text-xl text-gold">{rank}</span>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <p className="font-medium text-neutral-900">{task.title}</p>
+
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+          <span className="uppercase tracking-wide text-neutral-400">Imp.</span>
+          <select
+            value={task.impact}
+            onChange={(e) => onUpdateTask(task.id, { impact: e.target.value as Impact }).catch(() => {})}
+            className={`rounded-full border-none px-3 py-0.5 font-medium ${LEVEL_STYLES[task.impact]}`}
+          >
+            <option value="bassa">Bassa</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </select>
+
+          <span className="uppercase tracking-wide text-neutral-400">Urg.</span>
+          <select
+            value={task.urgency}
+            onChange={(e) => onUpdateTask(task.id, { urgency: e.target.value as Urgency }).catch(() => {})}
+            className={`rounded-full border-none px-3 py-0.5 font-medium ${LEVEL_STYLES[task.urgency]}`}
+          >
+            <option value="bassa">Bassa</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </select>
+
+          <span className="uppercase tracking-wide text-neutral-400">Owner</span>
+          <select
+            value={task.owner}
+            onChange={(e) => onUpdateTask(task.id, { owner: e.target.value as TaskOwner }).catch(() => {})}
+            className={`rounded-full border-none px-3 py-0.5 font-medium ${OWNER_STYLES[task.owner]}`}
+          >
+            <option value="Leonardo">Leonardo</option>
+            <option value="Amina">Amina</option>
+          </select>
+
+          {isOwnerRole && (
+            <label className="flex items-center gap-1 text-neutral-400">
+              Completata il
+              <input
+                type="date"
+                value={task.completed_on ?? ''}
+                onChange={(e) => onUpdateTask(task.id, { completed_on: e.target.value || null }).catch(() => {})}
+                className="rounded border border-neutral-300 px-1 py-0.5 text-neutral-900"
+              />
+            </label>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <select
-          value={task.impact}
-          onChange={(e) => onUpdateTask(task.id, { impact: e.target.value as Impact }).catch(() => {})}
-          className={`rounded border border-neutral-300 bg-transparent px-1 ${LEVEL_STYLES[task.impact]}`}
-        >
-          <option value="bassa">Impatto: Bassa</option>
-          <option value="media">Impatto: Media</option>
-          <option value="alta">Impatto: Alta</option>
-        </select>
-
-        <select
-          value={task.urgency}
-          onChange={(e) => onUpdateTask(task.id, { urgency: e.target.value as Urgency }).catch(() => {})}
-          className={`rounded border border-neutral-300 bg-transparent px-1 ${LEVEL_STYLES[task.urgency]}`}
-        >
-          <option value="bassa">Urgenza: Bassa</option>
-          <option value="media">Urgenza: Media</option>
-          <option value="alta">Urgenza: Alta</option>
-        </select>
-
-        <select
-          value={task.owner}
-          onChange={(e) => onUpdateTask(task.id, { owner: e.target.value as TaskOwner }).catch(() => {})}
-          className={`rounded px-2 py-0.5 ${OWNER_STYLES[task.owner]}`}
-        >
-          <option value="Leonardo">Owner: Leonardo</option>
-          <option value="Amina">Owner: Amina</option>
-        </select>
-
+      <div className="flex shrink-0 flex-col items-end gap-2">
         {isOwnerRole ? (
           <select
             value={task.status}
             onChange={(e) => onUpdateTask(task.id, { status: e.target.value as TaskStatus }).catch(() => {})}
-            className={`rounded px-2 py-0.5 ${STATUS_STYLES[task.status]}`}
+            className={`rounded-full border-none px-3 py-1 text-xs font-bold uppercase tracking-wide ${STATUS_STYLES[task.status]}`}
           >
-            <option value="non_iniziato">Stato: Non iniziato</option>
-            <option value="in_corso">Stato: In corso</option>
-            <option value="completato">Stato: Completato</option>
-            <option value="on_hold">Stato: On hold</option>
+            <option value="non_iniziato">Da fare</option>
+            <option value="in_corso">In corso</option>
+            <option value="completato">Completato</option>
+            <option value="on_hold">On hold</option>
           </select>
         ) : (
-          <span className={`rounded px-2 py-0.5 ${STATUS_STYLES[task.status]}`}>Stato: {STATUS_LABELS[task.status]}</span>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${STATUS_STYLES[task.status]}`}>
+            {STATUS_LABELS[task.status]}
+          </span>
         )}
 
         {isOwnerRole ? (
-          <label className="flex items-center gap-1 text-neutral-500">
-            Ore:
+          <label className="flex items-center gap-1 text-xs text-neutral-400">
+            Ore
             <input
               type="number"
               step="0.5"
@@ -103,11 +128,11 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
             />
           </label>
         ) : (
-          <span className="font-mono text-neutral-500">Ore: {task.hours}h</span>
+          <span className="font-mono text-xs text-neutral-500">{task.hours}h</span>
         )}
 
         {isOwnerRole && (
-          <button onClick={() => onDeleteTask(task.id).catch(() => {})} className="text-rose hover:underline">
+          <button onClick={() => onDeleteTask(task.id).catch(() => {})} className="text-xs text-rose hover:underline">
             Elimina
           </button>
         )}

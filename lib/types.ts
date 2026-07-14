@@ -35,5 +35,6 @@ export interface Task {
   urgency: Urgency;
   status: TaskStatus;
   owner: TaskOwner;
+  completed_on: string | null;
   created_at: string;
 }

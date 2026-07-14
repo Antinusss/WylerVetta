@@ -70,7 +70,10 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
   }, []);
 
   const handleUpdateTask = useCallback(
-    async (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => {
+    async (
+      id: string,
+      patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours' | 'completed_on'>>
+    ) => {
       const supabase = createClient();
       const { error } = await supabase.from('tasks').update(patch).eq('id', id);
       if (error) throw error;
@@ -105,7 +108,7 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-8">
         <HoursSummary role={role} settings={settings} purchases={purchases} tasks={tasks} />
         <AddHoursControl onAddHours={handleAddHours} />
-        <CompletionSummary role={role} tasks={tasks} onUpdateTask={handleUpdateTask} onDeleteTask={handleDeleteTask} />
+        <CompletionSummary role={role} tasks={tasks} onUpdateTask={handleUpdateTask} />
         <TaskList
           role={role}
           tasks={tasks}

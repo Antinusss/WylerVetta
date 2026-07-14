@@ -9,7 +9,10 @@ interface TaskListProps {
   role: Role;
   tasks: Task[];
   onAddTask: (title: string, impact: Impact, urgency: Urgency, owner: TaskOwner) => Promise<void>;
-  onUpdateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => Promise<void>;
+  onUpdateTask: (
+    id: string,
+    patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours' | 'completed_on'>>
+  ) => Promise<void>;
   onDeleteTask: (id: string) => Promise<void>;
 }
 
@@ -37,7 +40,22 @@ export default function TaskList({ role, tasks, onAddTask, onUpdateTask, onDelet
 
   return (
     <section className="rounded-card bg-neutral-50 p-6 shadow-lg">
-      <h2 className="mb-4 font-serif text-xl text-neutral-900">Task</h2>
+      <h2 className="mb-3 font-serif text-xl text-neutral-900">Task</h2>
+
+      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-rose" /> Da fare
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-amber" /> In corso
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-sage" /> Completato
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-violet" /> On hold
+        </span>
+      </div>
 
       <form onSubmit={handleSubmit} className="mb-4 flex flex-wrap items-end gap-3">
         <div className="flex-1">
@@ -76,7 +94,7 @@ export default function TaskList({ role, tasks, onAddTask, onUpdateTask, onDelet
         </button>
       </form>
 
-      <ul className="flex flex-col gap-3">
+      <ul className="flex flex-col">
         {active.map((task, index) => (
           <TaskItem
             key={task.id}

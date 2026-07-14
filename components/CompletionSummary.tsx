@@ -1,12 +1,14 @@
 import type { Role, Task, TaskStatus } from '@/lib/types';
 import { completionPercent } from '@/lib/calculations';
-import TaskItem from './TaskItem';
+import CompletedTasksTable from './CompletedTasksTable';
 
 interface CompletionSummaryProps {
   role: Role;
   tasks: Task[];
-  onUpdateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => Promise<void>;
-  onDeleteTask: (id: string) => Promise<void>;
+  onUpdateTask: (
+    id: string,
+    patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours' | 'completed_on'>>
+  ) => Promise<void>;
 }
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -16,11 +18,8 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   on_hold: 'On hold',
 };
 
-export default function CompletionSummary({ role, tasks, onUpdateTask, onDeleteTask }: CompletionSummaryProps) {
-  const completedTasks = tasks
-    .filter((t) => t.status === 'completato')
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  const completed = completedTasks.length;
+export default function CompletionSummary({ role, tasks, onUpdateTask }: CompletionSummaryProps) {
+  const completed = tasks.filter((t) => t.status === 'completato').length;
   const percent = completionPercent(tasks);
 
   const breakdown = (Object.keys(STATUS_LABELS) as TaskStatus[]).map((status) => ({
@@ -49,16 +48,7 @@ export default function CompletionSummary({ role, tasks, onUpdateTask, onDeleteT
         ))}
       </ul>
 
-      {completedTasks.length > 0 && (
-        <div className="mt-6 border-t border-neutral-200 pt-4">
-          <h3 className="mb-3 font-serif text-lg text-neutral-900">Elenco task completate</h3>
-          <ul className="flex flex-col gap-3">
-            {completedTasks.map((task) => (
-              <TaskItem key={task.id} task={task} role={role} onUpdateTask={onUpdateTask} onDeleteTask={onDeleteTask} />
-            ))}
-          </ul>
-        </div>
-      )}
+      <CompletedTasksTable role={role} tasks={tasks} onUpdateTask={onUpdateTask} />
     </section>
   );
 }

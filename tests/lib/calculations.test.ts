@@ -24,6 +24,7 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     urgency: 'media',
     status: 'non_iniziato',
     owner: 'Leonardo',
+    completed_on: null,
     created_at: new Date().toISOString(),
     ...overrides,
   };
