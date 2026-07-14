@@ -1,8 +1,12 @@
-import type { Task, TaskStatus } from '@/lib/types';
+import type { Role, Task, TaskStatus } from '@/lib/types';
 import { completionPercent } from '@/lib/calculations';
+import TaskItem from './TaskItem';
 
 interface CompletionSummaryProps {
+  role: Role;
   tasks: Task[];
+  onUpdateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'impact' | 'urgency' | 'owner' | 'status' | 'hours'>>) => Promise<void>;
+  onDeleteTask: (id: string) => Promise<void>;
 }
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -12,8 +16,11 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   on_hold: 'On hold',
 };
 
-export default function CompletionSummary({ tasks }: CompletionSummaryProps) {
-  const completed = tasks.filter((t) => t.status === 'completato').length;
+export default function CompletionSummary({ role, tasks, onUpdateTask, onDeleteTask }: CompletionSummaryProps) {
+  const completedTasks = tasks
+    .filter((t) => t.status === 'completato')
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const completed = completedTasks.length;
   const percent = completionPercent(tasks);
 
   const breakdown = (Object.keys(STATUS_LABELS) as TaskStatus[]).map((status) => ({
@@ -41,6 +48,17 @@ export default function CompletionSummary({ tasks }: CompletionSummaryProps) {
           </li>
         ))}
       </ul>
+
+      {completedTasks.length > 0 && (
+        <div className="mt-6 border-t border-neutral-200 pt-4">
+          <h3 className="mb-3 font-serif text-lg text-neutral-900">Elenco task completate</h3>
+          <ul className="flex flex-col gap-3">
+            {completedTasks.map((task) => (
+              <TaskItem key={task.id} task={task} role={role} onUpdateTask={onUpdateTask} onDeleteTask={onDeleteTask} />
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
