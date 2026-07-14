@@ -85,7 +85,7 @@ create policy settings_owner_update on settings for update using (is_owner()) wi
 create policy settings_owner_insert on settings for insert with check (is_owner());
 
 create policy hour_purchases_select on hour_purchases for select using (auth.uid() is not null);
-create policy hour_purchases_insert on hour_purchases for insert with check (auth.uid() is not null);
+create policy hour_purchases_insert on hour_purchases for insert with check (is_owner());
 create policy hour_purchases_owner_update on hour_purchases for update using (is_owner()) with check (is_owner());
 create policy hour_purchases_owner_delete on hour_purchases for delete using (is_owner());
 

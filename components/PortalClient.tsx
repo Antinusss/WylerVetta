@@ -107,7 +107,7 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
 
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-8">
         <HoursSummary role={role} settings={settings} purchases={purchases} tasks={tasks} />
-        <AddHoursControl onAddHours={handleAddHours} />
+        {role === 'owner' && <AddHoursControl onAddHours={handleAddHours} />}
         <CompletionSummary role={role} tasks={tasks} onUpdateTask={handleUpdateTask} />
         <TaskList
           role={role}
