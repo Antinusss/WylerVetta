@@ -1,14 +1,24 @@
 import type { Role, Settings, HourPurchase, Task } from '@/lib/types';
 import { purchasedHours, usedHours, remainingHours, usagePercent, economics } from '@/lib/calculations';
+import HourPurchasesList from './HourPurchasesList';
 
 interface HoursSummaryProps {
   role: Role;
   settings: Settings;
   purchases: HourPurchase[];
   tasks: Task[];
+  onUpdatePurchase: (id: string, patch: Partial<Pick<HourPurchase, 'hours' | 'purchased_on' | 'note'>>) => Promise<void>;
+  onDeletePurchase: (id: string) => Promise<void>;
 }
 
-export default function HoursSummary({ role, settings, purchases, tasks }: HoursSummaryProps) {
+export default function HoursSummary({
+  role,
+  settings,
+  purchases,
+  tasks,
+  onUpdatePurchase,
+  onDeletePurchase,
+}: HoursSummaryProps) {
   const purchased = purchasedHours(purchases);
   const used = usedHours(tasks);
   const remaining = remainingHours(purchased, used);
@@ -45,6 +55,13 @@ export default function HoursSummary({ role, settings, purchases, tasks }: Hours
       </div>
 
       {overBudget && <p className="mt-2 text-sm font-medium text-rose">Monte esaurito — da ricaricare</p>}
+
+      <HourPurchasesList
+        role={role}
+        purchases={purchases}
+        onUpdatePurchase={onUpdatePurchase}
+        onDeletePurchase={onDeletePurchase}
+      />
     </section>
   );
 }

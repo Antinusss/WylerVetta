@@ -63,6 +63,21 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
     if (error) throw error;
   }, []);
 
+  const handleUpdateHourPurchase = useCallback(
+    async (id: string, patch: Partial<Pick<HourPurchase, 'hours' | 'purchased_on' | 'note'>>) => {
+      const supabase = createClient();
+      const { error } = await supabase.from('hour_purchases').update(patch).eq('id', id);
+      if (error) throw error;
+    },
+    []
+  );
+
+  const handleDeleteHourPurchase = useCallback(async (id: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('hour_purchases').delete().eq('id', id);
+    if (error) throw error;
+  }, []);
+
   const handleAddTask = useCallback(async (title: string, impact: Impact, urgency: Urgency, owner: TaskOwner) => {
     const supabase = createClient();
     const { error } = await supabase.from('tasks').insert({ title, impact, urgency, owner });
@@ -106,7 +121,14 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
       />
 
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-8">
-        <HoursSummary role={role} settings={settings} purchases={purchases} tasks={tasks} />
+        <HoursSummary
+          role={role}
+          settings={settings}
+          purchases={purchases}
+          tasks={tasks}
+          onUpdatePurchase={handleUpdateHourPurchase}
+          onDeletePurchase={handleDeleteHourPurchase}
+        />
         {role === 'owner' && <AddHoursControl onAddHours={handleAddHours} />}
         <CompletionSummary role={role} tasks={tasks} onUpdateTask={handleUpdateTask} />
         <TaskList
