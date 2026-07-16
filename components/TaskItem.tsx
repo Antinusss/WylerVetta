@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import type { Role, Task, Impact, Urgency, TaskOwner, TaskStatus } from '@/lib/types';
+import CompleteTaskModal from './CompleteTaskModal';
 
 interface TaskItemProps {
   task: Task;
@@ -40,6 +42,21 @@ const OWNER_STYLES: Record<TaskOwner, string> = {
 
 export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask }: TaskItemProps) {
   const isOwnerRole = role === 'owner';
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+
+  function handleStatusChange(value: TaskStatus) {
+    if (value === 'completato' && task.status !== 'completato') {
+      setShowCompleteModal(true);
+      return;
+    }
+    onUpdateTask(task.id, { status: value }).catch(() => {});
+  }
+
+  function handleCompleteConfirm(hours: number) {
+    const today = new Date().toISOString().slice(0, 10);
+    onUpdateTask(task.id, { status: 'completato', hours, completed_on: today }).catch(() => {});
+    setShowCompleteModal(false);
+  }
 
   return (
     <li className="flex items-start gap-4 border-b border-neutral-200 py-4 last:border-0">
@@ -101,7 +118,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
         {isOwnerRole ? (
           <select
             value={task.status}
-            onChange={(e) => onUpdateTask(task.id, { status: e.target.value as TaskStatus }).catch(() => {})}
+            onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
             className={`rounded-full border-none px-3 py-1 text-xs font-bold uppercase tracking-wide ${STATUS_STYLES[task.status]}`}
           >
             <option value="non_iniziato">Da fare</option>
@@ -137,6 +154,14 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
           </button>
         )}
       </div>
+
+      {showCompleteModal && (
+        <CompleteTaskModal
+          taskTitle={task.title}
+          onCancel={() => setShowCompleteModal(false)}
+          onConfirm={handleCompleteConfirm}
+        />
+      )}
     </li>
   );
 }
