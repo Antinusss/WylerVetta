@@ -6,7 +6,7 @@ export function purchasedHours(purchases: HourPurchase[]): number {
 
 export function usedHours(tasks: Task[]): number {
   return tasks
-    .filter((t) => t.status === 'completato')
+    .filter((t) => t.status === 'completato' && t.owner !== 'Amina')
     .reduce((sum, t) => sum + t.hours, 0);
 }
 

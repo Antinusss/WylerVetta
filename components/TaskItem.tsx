@@ -42,6 +42,7 @@ const OWNER_STYLES: Record<TaskOwner, string> = {
 
 export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask }: TaskItemProps) {
   const isOwnerRole = role === 'owner';
+  const canEditStatus = isOwnerRole || task.owner === 'Amina';
   const [showCompleteModal, setShowCompleteModal] = useState(false);
 
   function handleStatusChange(value: TaskStatus) {
@@ -103,7 +104,7 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
       </div>
 
       <div className="flex shrink-0 flex-col items-end gap-2">
-        {isOwnerRole ? (
+        {canEditStatus ? (
           <select
             value={task.status}
             onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}

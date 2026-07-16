@@ -51,11 +51,12 @@ create or replace function is_owner() returns boolean language sql stable as $$
   select exists(select 1 from profiles where id = auth.uid() and role = 'owner');
 $$;
 
--- TRIGGER: il cliente non puo modificare status/hours/data completamento delle task
+-- TRIGGER: il cliente non puo modificare status/hours/data completamento delle task,
+-- tranne per le task assegnate ad Amina (il cliente le gestisce direttamente)
 create or replace function prevent_client_task_status_hours_change() returns trigger
 language plpgsql as $$
 begin
-  if not is_owner() then
+  if not is_owner() and old.owner <> 'Amina' then
     if new.status is distinct from old.status
       or new.hours is distinct from old.hours
       or new.completed_on is distinct from old.completed_on then

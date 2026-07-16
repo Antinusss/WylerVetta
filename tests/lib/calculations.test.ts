@@ -49,6 +49,14 @@ describe('usedHours', () => {
     ];
     expect(usedHours(tasks)).toBe(7);
   });
+
+  it('excludes completato tasks owned by Amina from the monte-ore total', () => {
+    const tasks = [
+      makeTask({ hours: 3, status: 'completato', owner: 'Leonardo' }),
+      makeTask({ hours: 5, status: 'completato', owner: 'Amina' }),
+    ];
+    expect(usedHours(tasks)).toBe(3);
+  });
 });
 
 describe('remainingHours', () => {

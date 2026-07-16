@@ -1,5 +1,4 @@
 import type { Role, Task } from '@/lib/types';
-import { usedHours } from '@/lib/calculations';
 
 interface CompletedTasksTableProps {
   role: Role;
@@ -28,7 +27,7 @@ export default function CompletedTasksTable({ role, tasks, onUpdateTask }: Compl
     return new Date(aDate).getTime() - new Date(bDate).getTime();
   });
 
-  const total = usedHours(completed);
+  const total = completed.reduce((sum, task) => sum + task.hours, 0);
   const isOwnerRole = role === 'owner';
 
   return (
