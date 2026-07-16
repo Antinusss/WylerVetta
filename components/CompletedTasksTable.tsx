@@ -1,4 +1,9 @@
-import type { Role, Task } from '@/lib/types';
+import type { Role, Task, TaskOwner } from '@/lib/types';
+
+const OWNER_STYLES: Record<TaskOwner, string> = {
+  Leonardo: 'bg-gold/20 text-gold',
+  Amina: 'bg-violet/20 text-violet',
+};
 
 interface CompletedTasksTableProps {
   role: Role;
@@ -37,6 +42,7 @@ export default function CompletedTasksTable({ role, tasks, onUpdateTask }: Compl
           <tr className="bg-gold/10 text-xs uppercase tracking-wide text-neutral-500">
             <th className="px-4 py-3 text-left font-medium">Attività svolte</th>
             <th className="px-4 py-3 text-center font-medium">Mese</th>
+            <th className="px-4 py-3 text-center font-medium">Owner</th>
             <th className="px-4 py-3 text-right font-medium">Ore</th>
             {isOwnerRole && <th className="px-4 py-3" />}
           </tr>
@@ -48,6 +54,11 @@ export default function CompletedTasksTable({ role, tasks, onUpdateTask }: Compl
               <td className="px-4 py-3 text-center">
                 <span className="rounded-full bg-skyblue/15 px-3 py-0.5 text-xs font-medium uppercase tracking-wide text-skyblue">
                   {monthLabel(task.completed_on, task.created_at)}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-center">
+                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${OWNER_STYLES[task.owner]}`}>
+                  {task.owner}
                 </span>
               </td>
               <td className="px-4 py-3 text-right font-mono text-neutral-900">{task.hours}</td>
@@ -68,6 +79,7 @@ export default function CompletedTasksTable({ role, tasks, onUpdateTask }: Compl
         <tfoot>
           <tr className="border-t border-neutral-200 bg-gold/10">
             <td className="px-4 py-3 font-serif font-bold text-neutral-900">Totale</td>
+            <td />
             <td />
             <td className="px-4 py-3 text-right font-mono font-bold text-neutral-900">{total}</td>
             {isOwnerRole && <td />}
