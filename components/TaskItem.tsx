@@ -99,18 +99,6 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
             <option value="Leonardo">Leonardo</option>
             <option value="Amina">Amina</option>
           </select>
-
-          {isOwnerRole && (
-            <label className="flex items-center gap-1 text-neutral-400">
-              Completata il
-              <input
-                type="date"
-                value={task.completed_on ?? ''}
-                onChange={(e) => onUpdateTask(task.id, { completed_on: e.target.value || null }).catch(() => {})}
-                className="rounded border border-neutral-300 px-1 py-0.5 text-neutral-900"
-              />
-            </label>
-          )}
         </div>
       </div>
 
@@ -130,22 +118,6 @@ export default function TaskItem({ task, rank, role, onUpdateTask, onDeleteTask 
           <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${STATUS_STYLES[task.status]}`}>
             {STATUS_LABELS[task.status]}
           </span>
-        )}
-
-        {isOwnerRole ? (
-          <label className="flex items-center gap-1 text-xs text-neutral-400">
-            Ore
-            <input
-              type="number"
-              step="0.5"
-              min="0"
-              value={task.hours}
-              onChange={(e) => onUpdateTask(task.id, { hours: parseFloat(e.target.value) || 0 }).catch(() => {})}
-              className="w-16 rounded border border-neutral-300 px-1 font-mono text-neutral-900"
-            />
-          </label>
-        ) : (
-          <span className="font-mono text-xs text-neutral-500">{task.hours}h</span>
         )}
 
         {isOwnerRole && (
