@@ -50,7 +50,10 @@ export default function PortalClient({ role, initialSettings, initialPurchases, 
           setTasks((prev) => prev.filter((t) => t.id !== (payload.old as Task).id));
         }
       })
-      .subscribe();
+      .subscribe((status, err) => {
+        // eslint-disable-next-line no-console
+        console.log('[realtime] status:', status, err ?? '');
+      });
 
     return () => {
       supabase.removeChannel(channel);
